@@ -8,19 +8,29 @@ function App() {
   const [list, setList] = useState([]);
   const [checkedCounter, setCheckedCounter] = useState(0);
   const [addTodo, setAddTodo] = useState("");
-
+  function CheckTaskList(BASE_URL,setList) {
+    axios
+      .get(BASE_URL + "/list")
+      .then((data) => {
+        console.log(data);
+        setList(data.data);
+      });
+  }
+  function CheckTaskCount(BASE_URL,setCheckedCounter) {
+    axios
+      .get(BASE_URL + "/count")
+      .then((data) => {
+        console.log(data);
+        setCheckedCounter(data.data);
+      });
+  }
   const Edit = (_id, text) => {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
     console.log(inputValue);
     axios.patch(BASE_URL + "/update", { _id: _id, text: String(inputValue) })
       .then((res) => {
-        axios
-        .get(BASE_URL + "/list")
-        .then((data) => {
-          console.log(data);
-          setList(data.data);
-        });
+        CheckTaskList(BASE_URL,setList)
       }).catch((err) => console.err(err))
   };
 
@@ -28,12 +38,8 @@ function App() {
     console.log({ _id: _id });
     axios.delete(BASE_URL + "/delete", { data: { _id: _id } })
       .then((res) => {
-        axios
-        .get(BASE_URL + "/list")
-        .then((data) => {
-          console.log(data);
-          setList(data.data);
-        });
+        CheckTaskList(BASE_URL,setList)
+        CheckTaskCount(BASE_URL,setCheckedCounter)
       })
   };
 
@@ -51,30 +57,13 @@ function App() {
   const toggleDone = (_id, isDone) => {
     console.log(_id, isDone);
     axios.patch(BASE_URL + "/checked", { _id: _id, isDone: isDone })
-      .then((res) => {
-        console.log(res)
-        axios
-        .get(BASE_URL + "/count")
-        .then((data) => {
-          console.log(data);
-          setCheckedCounter(data.data);
-        });
-      })
+      .then((res) => CheckTaskCount(BASE_URL,setCheckedCounter))
   };
 
   useEffect(() => {
-    axios
-      .get(BASE_URL + "/list")
-      .then((data) => {
-        console.log(data);
-        setList(data.data);
-      });
-    axios
-      .get(BASE_URL + "/count")
-      .then((data) => {
-        console.log(data);
-        setCheckedCounter(data.data);
-      });
+    CheckTaskList(BASE_URL,setList)
+    CheckTaskCount(BASE_URL,setCheckedCounter)
+
   }, []);
 
   return (
