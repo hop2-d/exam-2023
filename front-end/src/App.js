@@ -1,46 +1,73 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
-import axios from "axios";
 import { EditIcon, DeleteIcon } from "./icons/icons";
+import { instance } from "./instance/instance";
 
 function App() {
-  const [list, setList] = useState([
-    { text: "example data", isDone: true, _id: "anyid" },
-  ]);
+  const [list, setList] = useState([]);
   const [checkedCounter, setCheckedCounter] = useState(0);
   const [addTodo, setAddTodo] = useState("");
+  const ref = useRef();
 
   const Edit = (_id, text) => {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
 
-    console.log(inputValue);
+    instance
+      .patch("update", {
+        id: _id,
+        text: inputValue,
+      })
+      .then((res) => {
+        setList(res.data);
+        Count();
+      });
     //axios.patch()
   };
 
   const Delete = (_id) => {
     console.log(_id);
-    // axios.delete();
+    instance
+      .delete("delete", {
+        headers: {
+          id: _id,
+        },
+      })
+      .then((res) => {
+        Count();
+
+        setList(res.data);
+      });
   };
 
-  const Add = () => {
-    console.log(addTodo);
+  const Add = async () => {
+    // setList([...list, { text: addTodo, isDone: false, _id: null }]);
+    const addedLists = await instance.post("add", { text: addTodo });
+    console.log(addedLists.data);
+    setList(addedLists.data);
+    ref.current.value = "";
+    Count();
     // axios.post();
+  };
+  const Count = async () => {
+    const count = await instance.get("count");
+    setCheckedCounter(count.data.num);
+    console.log(count.data.num);
   };
 
   const toggleDone = (_id, isDone) => {
-    console.log(_id, isDone);
-    //axios.patch()
+    instance.patch("checked/" + _id).then((res) => {
+      setList(res.data);
+      Count();
+    });
   };
 
   useEffect(() => {
-    // axios
-    //   .get("Your backend URL")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     setList(data.data);
-    //   });
+    instance.get("list").then((res) => {
+      console.log(res.data);
+      setList(res.data);
+    });
+    Count();
   }, []);
 
   return (
@@ -57,7 +84,7 @@ function App() {
             <div className="checkbox">
               <input
                 type={"checkbox"}
-                defaultChecked={isDone}
+                checked={isDone}
                 onChange={() => toggleDone(_id, isDone)}
               />
               <div>{text}</div>
@@ -73,6 +100,7 @@ function App() {
           </div>
         ))}
         <input
+          ref={ref}
           placeholder="what's next?"
           onChange={(e) => setAddTodo(e.target.value)}
         />
