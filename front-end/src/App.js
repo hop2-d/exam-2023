@@ -64,6 +64,8 @@ function App() {
       .then(() => {
         axios.get("http://localhost:5000/tests").then((res) => {
           setData(res.data);
+          axios
+          .get("http://localhost:5000/count").then((res) => { console.log(res); setCheckedCounter(res.data)});
         });
       })
       .catch((err) => console.log(err));
@@ -72,11 +74,11 @@ function App() {
   const toggleDone = (_id, isDone) => {
     console.log(_id);
     axios
-      .delete("http://localhost:5000/test/" + _id)
+      .put("http://localhost:5000/" + _id)
       .then(() => {
-      //   axios.get("http://localhost:5000/tests").then((res) => {
-      //     setData(res.data);
-      //   });
+        //   axios.get("http://localhost:5000/tests").then((res) => {
+        //     setData(res.data);
+        //   });
       })
       .catch((err) => console.log(err));
     //axios.patch()
@@ -90,6 +92,10 @@ function App() {
     //     console.log(data);
     //     setList(data.data);
     //   });
+    axios.get("http://localhost:5000/count").then((res) => {
+      console.log(res);
+      setCheckedCounter(res.data);
+    });
   }, []);
 
   return (
@@ -97,7 +103,7 @@ function App() {
       <div className="title">
         <div>My Todo list</div>
         <div className="count">
-          {checkedCounter}/{list.length}
+          {checkedCounter}/{data && data.length}
         </div>
       </div>
       <div className="list">
@@ -107,9 +113,11 @@ function App() {
               <div className="checkbox">
                 <input
                   type={"checkbox"}
-                  // defaultChecked={isDone}
-                  onChange={() => {
-                    toggleDone(item._id);
+                  defaultChecked={item.isDone}
+                  onChange={(props) => {
+                    toggleDone(item._id,props.target.checked);
+                    axios
+                    .get("http://localhost:5000/count").then((res) => { console.log(res); setCheckedCounter(res.data)});
                   }}
                 />
                 <div>{item.name}</div>

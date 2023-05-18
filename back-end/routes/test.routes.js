@@ -6,6 +6,7 @@ const {
   deleteTest,
   updateTest,
   doneTest,
+  getCount,
 } = require("../controllers/test.controller");
 
 const router = express.Router();
@@ -16,6 +17,6 @@ router
   .post("/add", createTest)
   .delete("/delete/:id", deleteTest)
   .put("/update/:id", updateTest)
-  .put("/test/:id", doneTest);
+  .get("/count", getCount);
 
 exports.testRoutes = router;
