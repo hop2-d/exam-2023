@@ -12,26 +12,6 @@ function App() {
   const [addTodo, setAddTodo] = useState("");
   const { id } = useParams();
 
-  useEffect(() => {
-    axios.get('https://localhost:5000/list')
-      .then((res) => {
-        setList(res.data);
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  }, [])
-
-  useEffect(() => {
-    axios.get('https://localhost:5000/count')
-      .then((res) => {
-        setCheckedCounter(res.data);
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  }, [])
-
   const Edit = (_id, text) => {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
@@ -67,13 +47,13 @@ function App() {
   };
 
   useEffect(() => {
-    // axios
-    //   .get("Your backend URL")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     setList(data.data);
-    //   });
+    axios
+      .get("http://localhost:5000/list")
+      // .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setList(data.data);
+      });
   }, []);
 
   return (
