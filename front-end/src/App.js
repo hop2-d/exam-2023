@@ -1,47 +1,88 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import axios from "axios";
+
 import { EditIcon, DeleteIcon } from "./icons/icons";
+
+import { client } from "./client/client";
+
+import axios from "axios"
 
 function App() {
   const [list, setList] = useState([
-    { text: "example data", isDone: true, _id: "anyid" },
+    // { text: "example data", isDone: true, _id: "anyid" },
   ]);
   const [checkedCounter, setCheckedCounter] = useState(0);
   const [addTodo, setAddTodo] = useState("");
+
+  const [render,setRender]=useState();
 
   const Edit = (_id, text) => {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
 
-    console.log(inputValue);
+    client.patch("/update/"+_id , {updateText:inputValue})
+      .then(async(res)=>{
+        // console.log(res.data)
+        setRender(res.data)
+      }).catch((err)=>{
+        console.log(err)
+      })
     //axios.patch()
   };
 
   const Delete = (_id) => {
     console.log(_id);
-    // axios.delete();
+    client.delete("/delete/"+_id)
+      .then(async(res)=>{
+        // console.log(res.data);
+        setRender(res.data)
+      }).catch((err)=>{
+        console.log(err)
+      })
   };
 
-  const Add = () => {
-    console.log(addTodo);
-    // axios.post();
+  // console.log(addTodo)
+
+   const Add = () => {
+    if(addTodo!=""){
+      client.post("/add" , { text:addTodo })
+      .then(async(res)=>{
+        // console.log(res.data);
+        setRender(res.data)
+      }).catch((err)=>{
+        console.log(err)
+      })
+    }
   };
 
   const toggleDone = (_id, isDone) => {
-    console.log(_id, isDone);
-    //axios.patch()
+    client.patch("/checked/"+_id)
+      .then(async(res)=>{
+        // console.log(res.data)
+        setRender(res.data)
+      }).catch((err)=>{
+        console.log(err)
+      })
   };
 
   useEffect(() => {
-    // axios
-    //   .get("Your backend URL")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     setList(data.data);
-    //   });
-  }, []);
+    client.get("/list")
+      .then(async(res)=>{
+        // console.log(res.data);
+        setList(res.data);
+      }).catch((err)=>{
+        console.log(err)
+      })
+
+    client.get("/count")
+      .then(async(res)=>{
+        // console.log(res.data);
+        setCheckedCounter(res.data)
+      }).catch((err)=>{
+        console.log(err)
+      })
+  }, [Add , Delete , toggleDone ]);
+
 
   return (
     <div className="container">
@@ -52,7 +93,7 @@ function App() {
         </div>
       </div>
       <div className="list">
-        {list.map(({ text, _id, isDone }, index) => (
+        {list.map(({ text, _id, isDone,createdAt }, index) => (
           <div className="todo" key={index}>
             <div className="checkbox">
               <input
@@ -61,6 +102,7 @@ function App() {
                 onChange={() => toggleDone(_id, isDone)}
               />
               <div>{text}</div>
+              {/* <div>Created at: {createdAt}</div> */}
             </div>
             <div className="actions">
               <div onClick={() => Edit(_id, text)}>
@@ -76,7 +118,7 @@ function App() {
           placeholder="what's next?"
           onChange={(e) => setAddTodo(e.target.value)}
         />
-        <div className="button" onClick={() => Add()}>
+        <div className="button" onClick={Add}>
           Add task
         </div>
       </div>
