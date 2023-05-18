@@ -3,44 +3,86 @@ import "./App.css";
 import axios from "axios";
 import { EditIcon, DeleteIcon } from "./icons/icons";
 
+const baseUrl = "http://localhost:5000";
+
 function App() {
   const [list, setList] = useState([
     { text: "example data", isDone: true, _id: "anyid" },
   ]);
+
+  const [data, setData] = useState();
   const [checkedCounter, setCheckedCounter] = useState(0);
   const [addTodo, setAddTodo] = useState("");
 
   const Edit = (_id, text) => {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
-
     console.log(inputValue);
-    //axios.patch()
+    axios
+      .put("http://localhost:5000/update/" + _id, {
+        text: inputValue,
+      })
+      .then((res) => {
+        axios.get("http://localhost:5000/tests").then((res) => {
+          setData(res.data);
+        });
+      })
+      .catch((err) => console.log(err));
+    // axios.patch();
   };
 
-  const Delete = (_id) => {
+  const Delete = (_id, props1) => {
     console.log(_id);
-    // axios.delete();
+    axios
+      .delete(baseUrl + "/remove/" + _id)
+      .then((res) => {
+        console.log("Deleted", res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    const arr = [...list];
+    arr.splice(props1, 1);
+    setList(arr);
   };
 
-  const Add = () => {
+  const Add = (e) => {
     console.log(addTodo);
-    // axios.post();
+    if (addTodo) {
+      axios
+        .post(baseUrl + "/add", {
+          text: addTodo,
+        })
+        .then((res) => {
+          console.log(res.data);
+          const arr = [...list];
+          arr.push(res.data);
+          setList(arr);
+        });
+    } else console.log("something else");
   };
 
-  const toggleDone = (_id, isDone) => {
-    console.log(_id, isDone);
-    //axios.patch()
+  const toggleDone = (_id, isDone, arr) => {
+    console.log(_id, isDone, arr);
+    axios
+      .put("http://localhost:5000/" + _id)
+      .then(() => {
+      })
+      .catch((err) => console.log(err));
+    // axios.patch();
   };
 
   useEffect(() => {
-    // axios
-    //   .get("Your backend URL")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     setList(data.data);
-    //   });
+    axios
+      .get(baseUrl + "/lists")
+      .then((res) => {
+        console.log(res)
+        setList(res.data);
+        console.log("/list", res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, []);
 
   return (
@@ -76,9 +118,9 @@ function App() {
           placeholder="what's next?"
           onChange={(e) => setAddTodo(e.target.value)}
         />
-        <div className="button" onClick={() => Add()}>
+        <button className="button" onClick={() => Add()}>
           Add task
-        </div>
+        </button>
       </div>
     </div>
   );
