@@ -4,44 +4,77 @@ import axios from "axios";
 import { EditIcon, DeleteIcon } from "./icons/icons";
 
 function App() {
-  const [list, setList] = useState([
-    { text: "example data", isDone: true, _id: "anyid" },
-  ]);
+  const [list, setList] = useState([]);
   const [checkedCounter, setCheckedCounter] = useState(0);
   const [addTodo, setAddTodo] = useState("");
+  const baseurl = "http://localhost:5000/";
 
   const Edit = (_id, text) => {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
-
-    console.log(inputValue);
-    //axios.patch()
+    const body = {
+      text: inputValue,
+    };
+    axios
+      .patch(baseurl + "update", body, {
+        headers: {
+          id: _id,
+        },
+      })
+      .then((res) => console.log(res));
   };
 
   const Delete = (_id) => {
     console.log(_id);
-    // axios.delete();
+    axios
+      .delete(baseurl + "delete", {
+        headers: {
+          id: _id,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      });
   };
 
   const Add = () => {
     console.log(addTodo);
-    // axios.post();
+    const body = {
+      text: addTodo,
+      isDone: false,
+      createdDate: Date.now(),
+    };
+    axios.post("http://localhost:5000/add", body).then((res) => {
+      console.log(res.data);
+      setList((prev) => [...prev, res.data]);
+    });
   };
 
   const toggleDone = (_id, isDone) => {
-    console.log(_id, isDone);
-    //axios.patch()
+    console.log(isDone);
+    const body = {
+      isDone: isDone,
+    };
+    axios
+      .patch(baseurl + "checked", body, {
+        headers: {
+          id: _id,
+        },
+      })
+      .then((res) => console.log(res));
   };
 
   useEffect(() => {
-    // axios
-    //   .get("Your backend URL")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     setList(data.data);
-    //   });
+    axios.get(baseurl + "list").then((data) => {
+      console.log(data);
+      setList(data.data);
+    });
   }, []);
+  useEffect(() => {
+    axios.get(baseurl + "count").then((data) => {
+      setCheckedCounter(data.data);
+    });
+  });
 
   return (
     <div className="container">
