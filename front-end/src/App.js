@@ -3,12 +3,12 @@ import "./App.css";
 import axios from "axios";
 import { EditIcon, DeleteIcon } from "./icons/icons";
 
+const baseUrl = "http://localhost:5000/";
+
 function App() {
-  const [list, setList] = useState([
-    { text: "example data", isDone: true, _id: "anyid" },
-  ]);
+  const [data, setData] = useState([]);
   const [checkedCounter, setCheckedCounter] = useState(0);
-  const [addTodo, setAddTodo] = useState("");
+  const [addTodo, setAddTodo] = useState({ text: "" });
 
   const Edit = (_id, text) => {
     const inputValue = window.prompt("Edit", text);
@@ -20,12 +20,28 @@ function App() {
 
   const Delete = (_id) => {
     console.log(_id);
-    // axios.delete();
+    // axios
+    //   .delete(baseUrl + "delete:id", {})
+    //   .then((response) => {
+    //     console.log(response.data);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   };
 
   const Add = () => {
-    console.log(addTodo);
-    // axios.post();
+    console.log(addTodo.text);
+    axios
+      .post(baseUrl + "add", {
+        text: addTodo.text,
+      })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const toggleDone = (_id, isDone) => {
@@ -34,25 +50,27 @@ function App() {
   };
 
   useEffect(() => {
-    // axios
-    //   .get("Your backend URL")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     setList(data.data);
-    //   });
+    axios
+      .get(baseUrl + "list")
+      .then((res) => {
+        setData(res.data);
+        console.log(data);
+        const id = data[0]._id;
+        console.log(id);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
   return (
     <div className="container">
       <div className="title">
         <div>My Todo list</div>
-        <div className="count">
-          {checkedCounter}/{list.length}
-        </div>
+        <div className="count">{/* {checkedCounter}/{list.length} */}</div>
       </div>
       <div className="list">
-        {list.map(({ text, _id, isDone }, index) => (
+        {data.map(({ text, _id, isDone }, index) => (
           <div className="todo" key={index}>
             <div className="checkbox">
               <input
@@ -74,7 +92,10 @@ function App() {
         ))}
         <input
           placeholder="what's next?"
-          onChange={(e) => setAddTodo(e.target.value)}
+          onChange={(e) =>
+            setAddTodo((prev) => ({ ...prev, text: e.target.value }))
+          }
+          value={addTodo.text}
         />
         <div className="button" onClick={() => Add()}>
           Add task
