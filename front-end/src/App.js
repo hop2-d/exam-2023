@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import axios from "axios";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { EditIcon, DeleteIcon } from "./icons/icons";
 
 function App() {
@@ -8,6 +9,7 @@ function App() {
     { text: "example data", isDone: true, _id: "anyid" },
   ]);
   const [checkedCounter, setCheckedCounter] = useState(0);
+  const [count, setCount] = useState()
   const [addTodo, setAddTodo] = useState("");
 
   const Edit = (_id, text) => {
@@ -17,16 +19,36 @@ function App() {
     console.log(inputValue);
     //axios.patch()
   };
+  
+  const Count = () => {
+    axios
+    .get("http://localhost:5000/count")
+    .then((res) => {
+      console.log(res.data);
+      setCount(res.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
 
   const Delete = (_id) => {
     console.log(_id);
-    // axios.delete();
+    axios.delete('http://localhost:5000/delete');
   };
 
   const Add = () => {
     console.log(addTodo);
-    // axios.post();
-  };
+    axios
+    .post("http://localhost:5000/add")
+    .then((res) => {
+      console.log(res.data);
+      setList(res.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
 
   const toggleDone = (_id, isDone) => {
     console.log(_id, isDone);
