@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import axios from "axios";
 import { EditIcon, DeleteIcon } from "./icons/icons";
+import { useParams } from "react-router-dom";
 
 function App() {
   const [list, setList] = useState([
@@ -9,28 +10,60 @@ function App() {
   ]);
   const [checkedCounter, setCheckedCounter] = useState(0);
   const [addTodo, setAddTodo] = useState("");
+  const { id } = useParams();
+
+  useEffect(() => {
+    axios.get('https://localhost:5000/list')
+      .then((res) => {
+        setList(res.data);
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }, [])
+
+  useEffect(() => {
+    axios.get('https://localhost:5000/count')
+      .then((res) => {
+        setCheckedCounter(res.data);
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }, [])
 
   const Edit = (_id, text) => {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
 
     console.log(inputValue);
-    //axios.patch()
+    axios
+      .patch(`http://localhost:5000/update/${_id}`, {
+        text: text
+      })
   };
 
   const Delete = (_id) => {
     console.log(_id);
-    // axios.delete();
+    axios
+      .delete(`http://localhost:5000/delete/${_id}`)
   };
 
   const Add = () => {
     console.log(addTodo);
-    // axios.post();
+    axios
+      .post(`http://localhost:5000/add`, {
+        text: addTodo
+      })
+      .then(() => {
+        setAddTodo('');
+      })
   };
 
   const toggleDone = (_id, isDone) => {
     console.log(_id, isDone);
-    //axios.patch()
+    axios
+      .patch(`http://localhost:5000/checked/${_id}`)
   };
 
   useEffect(() => {
