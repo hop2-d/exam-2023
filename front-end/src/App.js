@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
 import "./App.css";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import { EditIcon, DeleteIcon } from "./icons/icons";
+import { instance } from "./Client/Instance";
 
 function App() {
-  const [list, setList] = useState([
-    { text: "example data", isDone: true, _id: "anyid" },
-  ]);
+  const [list, setList] = useState([{ text: "", isDone: false, _id: "" }]);
   const [checkedCounter, setCheckedCounter] = useState(0);
   const [addTodo, setAddTodo] = useState("");
 
@@ -14,34 +12,70 @@ function App() {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
 
-    console.log(inputValue);
-    //axios.patch()
+    instance
+      .patch(`update/${_id}`, { text: inputValue })
+      .then((_res) => {
+        getRequest();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const Delete = (_id) => {
-    console.log(_id);
-    // axios.delete();
+    instance
+      .delete(`delete/${_id}`)
+      .then((_res) => {
+        getRequest();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const Add = () => {
-    console.log(addTodo);
-    // axios.post();
+    instance
+      .post("add", {
+        text: addTodo,
+      })
+      .then((res) => {
+        setList([...list, res.data]);
+      });
   };
 
-  const toggleDone = (_id, isDone) => {
-    console.log(_id, isDone);
-    //axios.patch()
+  const toggleDone = (_id) => {
+    instance
+      .patch(`checked/${_id}`)
+      .then((_res) => {
+        getRequest();
+        getChecked();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getRequest = () => {
+    instance.get("list").then((res) => {
+      setList(res.data);
+    });
   };
 
   useEffect(() => {
-    // axios
-    //   .get("Your backend URL")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     setList(data.data);
-    //   });
+    getRequest();
+    getChecked();
   }, []);
+
+  const getChecked = () => {
+    instance
+      .get("count")
+      .then((res) => {
+        setCheckedCounter(res.data.length);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <div className="container">
@@ -57,7 +91,7 @@ function App() {
             <div className="checkbox">
               <input
                 type={"checkbox"}
-                defaultChecked={isDone}
+                checked={isDone}
                 onChange={() => toggleDone(_id, isDone)}
               />
               <div>{text}</div>
