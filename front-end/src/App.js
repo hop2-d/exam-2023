@@ -8,7 +8,7 @@ function App() {
     { text: "example data", isDone: true, _id: "anyid" },
   ]);
   const [checkedCounter, setCheckedCounter] = useState(0);
-  const [addTodo, setAddTodo] = useState("");
+  const [todo, setTodo] = useState("");
 
   const Edit = (_id, text) => {
     const inputValue = window.prompt("Edit", text);
@@ -20,11 +20,28 @@ function App() {
 
   const Delete = (_id) => {
     console.log(_id);
+    axios.delete(`http://localhost:5000/getlist/${id}`).then((res) => {
+      console.log("deleted from PORT 5000");
+    });
     // axios.delete();
   };
 
-  const Add = () => {
-    console.log(addTodo);
+  const createList = () => {
+    if (!todo) return;
+    axios
+      .post("http://localhost:5000/lists", {
+        text: todo,
+      })
+      .then((res) => {
+        console.log(res);
+        axios
+        .get("http://localhost:5000/getlists")
+        .then((data) => {
+          console.log(data);
+          setList(data.data);
+        });
+      });
+    
     // axios.post();
   };
 
@@ -34,13 +51,12 @@ function App() {
   };
 
   useEffect(() => {
-    // axios
-    //   .get("Your backend URL")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     setList(data.data);
-    //   });
+    axios
+      .get("http://localhost:5000/getlists")
+      .then((data) => {
+        console.log(data);
+        setList(data.data);
+      });
   }, []);
 
   return (
@@ -74,9 +90,9 @@ function App() {
         ))}
         <input
           placeholder="what's next?"
-          onChange={(e) => setAddTodo(e.target.value)}
+          onChange={(e) => setTodo(e.target.value)}
         />
-        <div className="button" onClick={() => Add()}>
+        <div className="button" onClick={createList}>
           Add task
         </div>
       </div>
