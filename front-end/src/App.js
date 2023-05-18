@@ -4,83 +4,109 @@ import axios from "axios";
 import { EditIcon, DeleteIcon } from "./icons/icons";
 
 function App() {
-  const [list, setList] = useState([
-    { text: "example data", isDone: true, _id: "anyid" },
-  ]);
+  const BASE_URL = "http://localhost:3100"
+  const [list, setList] = useState([]);
   const [checkedCounter, setCheckedCounter] = useState(0);
   const [addTodo, setAddTodo] = useState("");
-
+  function CheckTaskList(BASE_URL,setList) {
+    axios
+      .get(BASE_URL + "/list")
+      .then((data) => {
+        console.log(data);
+        setList(data.data);
+      });
+  }
+  function CheckTaskCount(BASE_URL,setCheckedCounter) {
+    axios
+      .get(BASE_URL + "/count")
+      .then((data) => {
+        console.log(data);
+        setCheckedCounter(data.data);
+      });
+  }
   const Edit = (_id, text) => {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
-
     console.log(inputValue);
-    //axios.patch()
+    axios.patch(BASE_URL + "/update", { _id: _id, text: String(inputValue) })
+      .then((res) => {
+        CheckTaskList(BASE_URL,setList)
+      }).catch((err) => console.err(err))
   };
 
   const Delete = (_id) => {
-    console.log(_id);
-    // axios.delete();
+    console.log({ _id: _id });
+    axios.delete(BASE_URL + "/delete", { data: { _id: _id } })
+      .then((res) => {
+        CheckTaskList(BASE_URL,setList)
+        CheckTaskCount(BASE_URL,setCheckedCounter)
+      })
   };
 
   const Add = () => {
     console.log(addTodo);
-    // axios.post();
+    axios.post(BASE_URL + "/add", { text: String(addTodo) }).then(
+      (res) => {
+        const arr = [...list]
+        arr.push(res.data)
+        setList(arr)
+      }
+    );
   };
 
   const toggleDone = (_id, isDone) => {
     console.log(_id, isDone);
-    //axios.patch()
+    axios.patch(BASE_URL + "/checked", { _id: _id, isDone: isDone })
+      .then((res) => CheckTaskCount(BASE_URL,setCheckedCounter))
   };
 
   useEffect(() => {
-    // axios
-    //   .get("Your backend URL")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     setList(data.data);
-    //   });
+    CheckTaskList(BASE_URL,setList)
+    CheckTaskCount(BASE_URL,setCheckedCounter)
+
   }, []);
 
   return (
-    <div className="container">
-      <div className="title">
-        <div>My Todo list</div>
-        <div className="count">
-          {checkedCounter}/{list.length}
-        </div>
-      </div>
-      <div className="list">
-        {list.map(({ text, _id, isDone }, index) => (
-          <div className="todo" key={index}>
-            <div className="checkbox">
-              <input
-                type={"checkbox"}
-                defaultChecked={isDone}
-                onChange={() => toggleDone(_id, isDone)}
-              />
-              <div>{text}</div>
-            </div>
-            <div className="actions">
-              <div onClick={() => Edit(_id, text)}>
-                <EditIcon />
-              </div>
-              <div onClick={() => Delete(_id)}>
-                <DeleteIcon />
-              </div>
-            </div>
+    list && (
+
+
+      <div className="container">
+        <div className="title">
+          <div>My Todo list</div>
+          <div className="count">
+            {checkedCounter}/{list.length}
           </div>
-        ))}
-        <input
-          placeholder="what's next?"
-          onChange={(e) => setAddTodo(e.target.value)}
-        />
-        <div className="button" onClick={() => Add()}>
-          Add task
         </div>
-      </div>
-    </div>
+        <div className="list">
+          {list.map(({ text, _id, isDone }, index) => (
+            <div className="todo" key={index}>
+              <div className="checkbox">
+                <input
+                  type={"checkbox"}
+                  defaultChecked={isDone}
+                  onChange={(props) => { toggleDone(_id, props.target.checked) }}
+                />
+                <div>{text}</div>
+              </div>
+              <div className="actions">
+                <div onClick={() => Edit(_id, text)}>
+                  <EditIcon />
+                </div>
+                <div onClick={() => Delete(_id)}>
+                  <DeleteIcon />
+                </div>
+              </div>
+            </div>
+          ))}
+          <input
+            placeholder="what's next?"
+            onChange={(e) => setAddTodo(e.target.value)}
+          />
+          <div className="button" onClick={() => Add()}>
+            Add task
+          </div>
+        </div>
+      </div>)
   );
 }
 
