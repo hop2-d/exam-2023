@@ -17,7 +17,10 @@ function App() {
     if (!inputValue) return;
 
     console.log(inputValue);
-    //axios.patch()
+    axios.patch("http://localhost:5000/update",{
+      id: _id,
+      text: inputValue
+    })
   };
   
   const Count = () => {
