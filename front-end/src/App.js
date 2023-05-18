@@ -4,43 +4,50 @@ import axios from "axios";
 import { EditIcon, DeleteIcon } from "./icons/icons";
 
 function App() {
-  const [list, setList] = useState([
-    { text: "example data", isDone: true, _id: "anyid" },
-  ]);
+  const [list, setList] = useState([]);
   const [checkedCounter, setCheckedCounter] = useState(0);
   const [addTodo, setAddTodo] = useState("");
+  const ref = useRef();
 
   const Edit = (_id, text) => {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
 
-    console.log(inputValue);
-    //axios.patch()
+              
+      .patch("update", {
+        id: _id,
+        text: inputValue,
+      })
   };
 
   const Delete = (_id) => {
     console.log(_id);
-    // axios.delete();
+              
+      .delete("delete", {
+        headers: {
+          id: _id,
+        },
+      })
   };
 
-  const Add = () => {
-    console.log(addTodo);
-    // axios.post();
+  const Add = async () => {
+    const addedLists = await           .post("add", { text: addTodo });
+    console.log(addedLists.data);
+    setList(addedLists.data);
+    ref.current.value = "";
   };
 
   const toggleDone = (_id, isDone) => {
-    console.log(_id, isDone);
-    //axios.patch()
+              .patch("checked/" + _id).then((res) => {
+      setList(res.data);
+    });
   };
 
   useEffect(() => {
-    // axios
-    //   .get("Your backend URL")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     setList(data.data);
-    //   });
+              .get("list").then((res) => {
+      console.log(res.data);
+      setList(res.data);
+    });
   }, []);
 
   return (
