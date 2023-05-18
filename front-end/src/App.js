@@ -34,7 +34,14 @@ function App() {
 
   const Delete = (_id) => {
     console.log(_id);
-    axios.delete('http://localhost:5000/delete');
+    axios.delete('http://localhost:5000/delete')
+    .then((res) => {
+      console.log(res.data);
+      setList(res.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
   };
 
   const Add = () => {
