@@ -4,6 +4,7 @@ import axios from "axios";
 import { EditIcon, DeleteIcon } from "./icons/icons";
 
 function App() {
+  const url = "http://localhost:4000/"
   const [list, setList] = useState([
     { text: "example data", isDone: true, _id: "anyid" },
   ]);
@@ -14,34 +15,38 @@ function App() {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
 
-    console.log(inputValue);
-    //axios.patch()
+    axios.patch(url + "update", {
+      id: _id,
+      text: inputValue
+    })
   };
 
   const Delete = (_id) => {
-    console.log(_id);
-    // axios.delete();
+    axios.delete(url + "delete", {
+      id: _id
+    });
   };
 
-  const Add = () => {
-    console.log(addTodo);
-    // axios.post();
+  const Add = async () => {
+    await axios.post(url + "add", {
+      text: addTodo
+    })
   };
 
   const toggleDone = (_id, isDone) => {
     console.log(_id, isDone);
-    //axios.patch()
+    axios.patch(url + "checked", {
+      id: _id
+    })
   };
 
+  const getData = async () => {
+    const data = await axios.get(url + "list")
+    setList(data.data)
+  }
   useEffect(() => {
-    // axios
-    //   .get("Your backend URL")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     setList(data.data);
-    //   });
-  }, []);
+    getData()
+  }, );
 
   return (
     <div className="container">
