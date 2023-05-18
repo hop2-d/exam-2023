@@ -42,7 +42,7 @@ function App() {
 
   const Add = () => {
     axios
-      .post("http://localhost:5000" + "/test", {
+      .post("http://localhost:5000" + "/add", {
         name: name.current.value,
       })
       .then((res) => {
@@ -60,7 +60,7 @@ function App() {
   const deleteTest = (_id) => {
     setTestid(_id);
     axios
-      .delete("http://localhost:5000/test/" + _id)
+      .delete("http://localhost:5000/delete/" + _id)
       .then(() => {
         axios.get("http://localhost:5000/tests").then((res) => {
           setData(res.data);
@@ -71,6 +71,14 @@ function App() {
 
   const toggleDone = (_id, isDone) => {
     console.log(_id);
+    axios
+      .delete("http://localhost:5000/test/" + _id)
+      .then(() => {
+      //   axios.get("http://localhost:5000/tests").then((res) => {
+      //     setData(res.data);
+      //   });
+      })
+      .catch((err) => console.log(err));
     //axios.patch()
   };
 
