@@ -24,7 +24,7 @@ const deleteTest = async (req, res) => {
 
 const updateTest = async (req, res) => {
   const testId = req.params.id;
-  const name = req.body.name
+  const name = req.body.name;
   const test = await Test.findById(testId);
   test.name = name;
   await test.save();
@@ -33,9 +33,9 @@ const updateTest = async (req, res) => {
 
 const doneTest = async (req, res) => {
   const testId = req.params.id;
-  const songId = req.body.id;
+  const name = req.body.name;
   const test = await Test.findById(testId);
-  test.songs.push(songId);
+  test.name.push;
   await test.save();
   res.send(test);
 };

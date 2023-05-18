@@ -13,9 +13,9 @@ const router = express.Router();
 router
   .get("/tests", getTests)
   .get("/test/:id", getTest)
-  .post("/test", createTest)
-  .delete("/test/:id", deleteTest)
+  .post("/add", createTest)
+  .delete("/delete/:id", deleteTest)
   .put("/update/:id", updateTest)
-  // .put("/test/:id", doneTest);
+  .put("/test/:id", doneTest);
 
 exports.testRoutes = router;
