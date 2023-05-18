@@ -5,9 +5,7 @@ import { EditIcon, DeleteIcon } from "./icons/icons";
 
 function App() {
   const BASE_URL = "http://localhost:3100"
-  const [list, setList] = useState([
-    { text: "example data", isDone: true, _id: "anyid" },
-  ]);
+  const [list, setList] = useState([]);
   const [checkedCounter, setCheckedCounter] = useState(0);
   const [addTodo, setAddTodo] = useState("");
 
@@ -17,7 +15,12 @@ function App() {
     console.log(inputValue);
     axios.patch(BASE_URL + "/update", { _id: _id, text: String(inputValue) })
       .then((res) => {
-
+        axios
+        .get(BASE_URL + "/list")
+        .then((data) => {
+          console.log(data);
+          setList(data.data);
+        });
       }).catch((err) => console.err(err))
   };
 
@@ -25,15 +28,20 @@ function App() {
     console.log({ _id: _id });
     axios.delete(BASE_URL + "/delete", { data: { _id: _id } })
       .then((res) => {
-        console.log(res)
+        axios
+        .get(BASE_URL + "/list")
+        .then((data) => {
+          console.log(data);
+          setList(data.data);
+        });
       })
   };
 
   const Add = () => {
     console.log(addTodo);
     axios.post(BASE_URL + "/add", { text: String(addTodo) }).then(
-      (res)=>{
-        const arr=[...list]
+      (res) => {
+        const arr = [...list]
         arr.push(res.data)
         setList(arr)
       }
@@ -43,7 +51,15 @@ function App() {
   const toggleDone = (_id, isDone) => {
     console.log(_id, isDone);
     axios.patch(BASE_URL + "/checked", { _id: _id, isDone: isDone })
-    .then((res)=>console.log(res))
+      .then((res) => {
+        console.log(res)
+        axios
+        .get(BASE_URL + "/count")
+        .then((data) => {
+          console.log(data);
+          setCheckedCounter(data.data);
+        });
+      })
   };
 
   useEffect(() => {
@@ -79,7 +95,7 @@ function App() {
                 <input
                   type={"checkbox"}
                   defaultChecked={isDone}
-                  onChange={(props) => {toggleDone(_id, props.target.checked)}}
+                  onChange={(props) => { toggleDone(_id, props.target.checked) }}
                 />
                 <div>{text}</div>
               </div>
