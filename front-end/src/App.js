@@ -20,12 +20,16 @@ function App() {
 
   const Delete = (_id) => {
     console.log(_id);
-    // axios.delete();
+    axios.post("http://localhost:5000/").then(
+      console.log("deleted")
+    )
   };
 
   const Add = () => {
     console.log(addTodo);
-    // axios.post();
+    axios.get("http://localhost:5000/list").then(
+      console.log("added")
+    )
   };
 
   const toggleDone = (_id, isDone) => {
@@ -34,13 +38,13 @@ function App() {
   };
 
   useEffect(() => {
-    // axios
-    //   .get("Your backend URL")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     setList(data.data);
-    //   });
+    axios
+      .get("Your backend URL")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setList(data.data);
+      });
   }, []);
 
   return (

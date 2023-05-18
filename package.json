@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky install && cd ./front-end && npm install"
+    "prepare": "husky install && cd ./front-end && npm install",
+    "start-back": "nodemon ./back-end/index.js"
   },
   "repository": {
     "type": "git",
@@ -25,5 +26,12 @@
     "hooks": {
       "pre-commit": "bash .husky/pre-commit"
     }
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mongodb": "^5.5.0",
+    "mongoose": "^7.1.1",
+    "nodemon": "^2.0.22"
   }
 }
