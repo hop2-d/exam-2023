@@ -47,4 +47,4 @@
   - `GET http://localhost:5000/add` / 1 оноо /
   - `GET http://localhost:5000/delete` / 1 оноо / 
   - `GET http://localhost:5000/checked` / 1 оноо / 
-  - `GET http://loca lhost:5000/update`  / 2 оноо /
+  - `GET http://localhost:5000/update`  / 2 оноо /
