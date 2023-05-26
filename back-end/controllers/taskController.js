@@ -36,15 +36,13 @@ exports.deleteTask = async (req, res) => {
   }
 };
 exports.updateText = async (req, res) => {
-  const id = req.params.id;
   try {
+    const id = req.params.id;
     if (!req.body.text) return res.send("Text is required");
-    console.log(req.body.text);
-    const task = await Task.findOne({ _id: id });
-    task.text = req.body.text;
-    const result = await Todo.findByIdAndUpdate(id, task);
+    const result = await Task.findByIdAndUpdate(id, {text: req.body.text});
     res.send(result);
   }  catch (error) {
+    console.log(error)
     return res.status(404).send({ error });
   }
 };
