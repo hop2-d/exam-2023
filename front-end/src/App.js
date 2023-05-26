@@ -17,13 +17,28 @@ function App() {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
     console.log(inputValue);
-    axios.patch();
+    axios
+      .patch(baseUrl + "/update/" + _id, { text: inputValue })
+      .then((res) => {
+        console.log(res.data);
+        //Collecting the updated data from db
+        axios
+          .get(baseUrl + "/list")
+          // .then((response) => response.json())
+          .then((data) => {
+            console.log(data.data);
+            setList(data.data);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const Delete = (_id, props1) => {
     console.log(_id);
     axios
-      .delete("/delete" + _id)
+      .delete(baseUrl + "/delete/" + _id)
       .then((res) => {
         console.log("Deleted", res.data);
       })
@@ -52,8 +67,37 @@ function App() {
   };
 
   const toggleDone = (_id, isDone) => {
-    console.log(_id, isDone);
-    axios.patch();
+    axios
+    .patch(baseUrl + "/checked/" + _id)
+    .then((res) => {
+      console.log(res.data);
+      //Collecting the updated data from db
+      axios
+        .get(baseUrl + "/list")
+        // .then((response) => response.json())
+        .then((data) => {
+          console.log(data.data);
+          setList(data.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      //
+      axios
+        .get(baseUrl + "/count")
+        // .then((response) => response.json())
+        .then((data) => {
+          console.log(data, 'asd');
+          setCheckedCounter(data.data);
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+
+
   };
 
   useEffect(() => {
@@ -66,7 +110,18 @@ function App() {
       .catch((error) => {
         console.log(error);
       });
+
+      axios
+      .get(baseUrl + "/count")
+      // .then((response) => response.json())
+      .then((data) => {
+        console.log(data, 'asd');
+        setCheckedCounter(data.data);
+      });
+      
   }, []);
+
+  console.log(checkedCounter)
 
   return (
     <div className="container">
