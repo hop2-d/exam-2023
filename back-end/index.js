@@ -2,7 +2,8 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const connect = require("./config/db");
-const { listRoutes } = require("./Routes/list.routes")
+const { listRoutes } = require("./Routes/list.routes");
+
 
 console.log(`${process.env.PORT}`);
 
@@ -10,7 +11,7 @@ const app = express();
 
 const port = process.env.PORT || 12345;
 
-connect();
+connect()
 
 app.use(cors());
 app.use(express.json());
@@ -23,5 +24,5 @@ app.get("/", (req, res) => {
 
 app.listen(port, () => {
   console.log(`Listening on port : ${port}`);
-  console.log("Successfully connected");
+  console.log("Successfully connected App");
 });

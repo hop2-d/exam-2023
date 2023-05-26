@@ -10,6 +10,7 @@ function App() {
     { text: "example data", isDone: true, _id: "anyid" },
   ]);
 
+  const [data, setData] = useState();
   const [checkedCounter, setCheckedCounter] = useState(0);
   const [addTodo, setAddTodo] = useState("");
 
@@ -17,13 +18,23 @@ function App() {
     const inputValue = window.prompt("Edit", text);
     if (!inputValue) return;
     console.log(inputValue);
-    axios.patch();
+    axios
+      .put("http://localhost:5000/update/" + _id, {
+        text: inputValue,
+      })
+      .then((res) => {
+        axios.get("http://localhost:5000/tests").then((res) => {
+          setData(res.data);
+        });
+      })
+      .catch((err) => console.log(err));
+    // axios.patch();
   };
 
   const Delete = (_id, props1) => {
     console.log(_id);
     axios
-      .delete("/delete" + _id)
+      .delete(baseUrl + "/remove/" + _id)
       .then((res) => {
         console.log("Deleted", res.data);
       })
@@ -40,7 +51,7 @@ function App() {
     if (addTodo) {
       axios
         .post(baseUrl + "/add", {
-          text : addTodo,
+          text: addTodo,
         })
         .then((res) => {
           console.log(res.data);
@@ -51,15 +62,21 @@ function App() {
     } else console.log("something else");
   };
 
-  const toggleDone = (_id, isDone) => {
-    console.log(_id, isDone);
-    axios.patch();
+  const toggleDone = (_id, isDone, arr) => {
+    console.log(_id, isDone, arr);
+    axios
+      .put("http://localhost:5000/" + _id)
+      .then(() => {
+      })
+      .catch((err) => console.log(err));
+    // axios.patch();
   };
 
   useEffect(() => {
     axios
-      .get(baseUrl + "/list")
+      .get(baseUrl + "/lists")
       .then((res) => {
+        console.log(res)
         setList(res.data);
         console.log("/list", res.data);
       })
